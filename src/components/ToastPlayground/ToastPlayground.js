@@ -13,16 +13,23 @@ function ToastPlayground() {
   const [showToast, setShowToast] = useState(false);
   const [ToastInfo, setToastInfo] = useState([]);
 
-  function handleClick() {
-    const nextToast = { message, variant };
+  function handleClick(e) {
+    e.preventDefault();
+    const nextToast = {
+      message,
+      variant,
+      shown: true,
+      id: crypto.randomUUID(),
+    };
     setToastInfo([...ToastInfo, nextToast]);
     setShowToast(true);
     setMessage("");
     setVariant(VARIANT_OPTIONS[0]);
   }
 
-  function handleDismiss() {
-    setShowToast(false);
+  function handleDismiss(e, id) {
+    const updatedToasts = ToastInfo.filter((toast) => toast.id !== id);
+    setToastInfo(updatedToasts);
   }
 
   return (
@@ -31,14 +38,15 @@ function ToastPlayground() {
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
-      {showToast &&
-        ToastInfo.map(({ message, variant }) => (
-          <ToastShelf variant={variant} handleDismiss={handleDismiss}>
-            {message}
-          </ToastShelf>
-        ))}
 
-      <div className={styles.controlsWrapper}>
+      <ToastShelf
+        ToastInfo={ToastInfo}
+        variant={variant}
+        showToast={showToast}
+        handleDismiss={handleDismiss}
+      ></ToastShelf>
+
+      <form className={styles.controlsWrapper}>
         <div className={styles.row}>
           <label
             htmlFor="message"
@@ -82,7 +90,7 @@ function ToastPlayground() {
             <Button onClick={handleClick}>Pop Toast!</Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
